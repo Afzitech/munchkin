@@ -112,7 +112,8 @@
         let currentQ = 0;
 
         function startExperience() {
-            bgMusic.play().catch(e => console.log("Audio play blocked"));
+            // Music plays as soon as she clicks "YES"
+            bgMusic.play().catch(e => console.log("Audio enabled after interaction"));
             triggerLoading("Initializing Emotional Cache...", 2);
         }
 
@@ -164,7 +165,7 @@
                     document.getElementById('galleryNext').style.display = 'block';
                     slideCounter.innerText = "All memories verified.";
                 }
-            }, 3500); // 3.5 seconds per photo
+            }, 3500); // Transitions every 3.5 seconds
         }
 
         function loadQuestion() { 
