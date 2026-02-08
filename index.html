@@ -3,100 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Afsal_Sneha_v2.0</title>
+    <title>Afsal_Sneha_v2.patch</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --primary: #ff4d6d; --secondary: #590d22; --bg: #fff0f3; }
-        body { margin: 0; background: var(--bg); font-family: 'Courier New', Courier, monospace; color: var(--secondary); display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        :root { --primary: #ff4d6d; --secondary: #590d22; --bg: #fff0f3; --dark: #2b2d42; }
         
-        #container { width: 90%; max-width: 550px; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin: 40px 0; text-align: center; }
-        
-        /* The Gallery Styling */
-        .gallery-container {
-            display: flex;
-            overflow-x: auto;
-            gap: 15px;
-            padding: 20px 0;
-            scroll-snap-type: x mandatory;
-            scrollbar-width: thin;
+        body { 
+            margin: 0; 
+            background: var(--bg); 
+            font-family: 'Courier New', Courier, monospace; 
+            color: var(--secondary); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            overflow-x: hidden; 
         }
-        .gallery-container::-webkit-scrollbar { height: 6px; }
-        .gallery-container::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-        
-        .photo-card {
-            flex: 0 0 80%;
-            scroll-snap-align: center;
-            background: #f8f9fa;
-            border: 5px solid white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            transform: rotate(calc(var(--r) * 1deg));
-        }
-        .photo-card img { width: 100%; border-radius: 5px; display: block; filter: grayscale(20%); transition: 0.3s; }
-        .photo-card img:hover { filter: grayscale(0%); }
 
-        .logs { text-align: left; background: #2b2d42; color: #8d99ae; padding: 15px; border-radius: 8px; font-size: 0.8rem; height: 120px; overflow-y: auto; margin: 20px 0; border: 1px solid #ced4da; }
+        #container { 
+            width: 90%; 
+            max-width: 500px; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            text-align: center; 
+            position: relative; 
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .phase { display: none; }
+        .active { display: block; animation: fadeIn 0.8s; }
         
-        h1 { color: var(--primary); margin: 10px 0; font-size: 1.5rem; }
-        .btn-group { display: flex; justify-content: center; gap: 20px; margin-top: 20px; height: 60px; position: relative; }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #eee;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        #progress-bar {
+            width: 25%;
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.5s ease;
+        }
+
+        /* Phase 2: Gallery Styling */
+        .gallery { 
+            display: flex; 
+            overflow-x: auto; 
+            gap: 15px; 
+            padding: 20px 0; 
+            scroll-snap-type: x mandatory; 
+            scrollbar-width: none;
+        }
+        .gallery::-webkit-scrollbar { display: none; }
         
-        button { padding: 12px 30px; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        #yesBtn { background: var(--primary); color: white; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); }
+        .photo-card { 
+            flex: 0 0 85%; 
+            scroll-snap-align: center; 
+            border: 5px solid white; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+            border-radius: 10px; 
+            background: #fff;
+        }
+        .photo-card img { width: 100%; border-radius: 5px; display: block; }
+
+        /* Buttons */
+        .btn-group { 
+            display: flex; 
+            justify-content: center; 
+            gap: 20px; 
+            margin-top: 25px; 
+            height: 50px; 
+            position: relative; 
+        }
+        
+        button { 
+            padding: 12px 25px; 
+            border: none; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-family: inherit; 
+            transition: 0.3s; 
+        }
+
+        .btn-next { background: var(--primary); color: white; width: 100%; margin-top: 15px; }
+        #yesBtn { background: var(--primary); color: white; font-size: 1.1rem; }
         #noBtn { background: #dee2e6; color: #495057; position: absolute; z-index: 1000; }
 
-        #success { display: none; padding: 40px 0; }
-        .heart-loader { font-size: 4rem; animation: beat 1s infinite; }
+        /* Phase 3: Quiz Styling */
+        .quiz-input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 15px 0; 
+            border: 2px solid #eee; 
+            border-radius: 10px; 
+            outline: none; 
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .quiz-input:focus { border-color: var(--primary); }
+        #question-text { font-weight: bold; min-height: 50px; transition: opacity 0.3s; }
+
+        /* Final Heart */
+        .heart-loader { font-size: 4rem; animation: beat 1s infinite; margin-bottom: 10px; }
         @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
     </style>
 </head>
 <body>
 
     <div id="container">
-        <div id="main-content">
-            <h1>Our System History 📂</h1>
-            
-            <p style="font-size: 0.8rem; color: #888;">(Swipe through our memories...)</p>
-            <div class="gallery-container" id="gallery">
-                </div>
+        <div class="progress-container">
+            <div id="progress-bar"></div>
+        </div>
 
-            <div class="logs">
-                <div style="color: var(--primary)">[SYSTEM CHECK] Analyzing 22 captured fragments...</div>
-                <div>[RESULT] High compatibility detected in all frames.</div>
-                <div>[STATUS] Memories verified. Emotional cache full.</div>
-                <div>[PROMPT] User 'Afsal' requests a 'Valentine' merge.</div>
-            </div>
-
-            <p><strong>Sneha, will you be my Valentine?</strong></p>
-            <p style="font-size: 0.7rem;">(And let's keep writing the code for v2.0 together)</p>
-
+        <div id="phase1" class="phase active">
+            <h1 style="color: var(--primary)">System Alert ⚠️</h1>
+            <p>A major update to <strong>Connection_v2.0</strong> is ready for deployment.</p>
+            <p style="font-size: 1.2rem; margin: 25px 0;"><strong>Will you be my Valentine, Sneha?</strong></p>
             <div class="btn-group">
-                <button id="yesBtn" onclick="finish()">YES!</button>
+                <button id="yesBtn" onclick="goToPhase(2)">YES</button>
                 <button id="noBtn">No</button>
             </div>
         </div>
 
-        <div id="success">
+        <div id="phase2" class="phase">
+            <h1 style="color: var(--primary)">Restoring Fragments...</h1>
+            <p>Scanning 22 memory sectors found in local storage:</p>
+            <div class="gallery" id="galleryContainer"></div>
+            <p style="font-size: 0.8rem; color: #888;">Swipe to verify all 22 memories &gt;&gt;</p>
+            <button class="btn-next" onclick="goToPhase(3)">Next: Security Verification</button>
+        </div>
+
+        <div id="phase3" class="phase">
+            <h1 style="color: var(--primary)">Identity Check 🔐</h1>
+            <p style="font-size: 0.8rem;">Answer correctly to merge the Valentine branch.</p>
+            <div id="quiz-content">
+                <p id="question-text">Loading...</p>
+                <input type="text" id="quiz-answer" class="quiz-input" placeholder="Type answer here...">
+                <button class="btn-next" onclick="checkAnswer()">Verify Identity</button>
+            </div>
+        </div>
+
+        <div id="final" class="phase">
             <div class="heart-loader">❤️</div>
-            <h1>Update Successful!</h1>
-            <p>I'm so glad we're on the same page. Let's make this year better than the last two combined.</p>
+            <h1 style="color: var(--primary)">Update Complete!</h1>
+            <p>Sneha, I'm so glad we're on the same page (literally). Let's make this year amazing. No more 'heavy' vibes, just us.</p>
+            <p style="font-size: 0.8rem; color: #888;">- Afsal Rahman J</p>
         </div>
     </div>
 
     <script>
-        const gallery = document.getElementById('gallery');
         const noBtn = document.getElementById('noBtn');
+        const progressBar = document.getElementById('progress-bar');
 
-        // Inject 22 photos automatically
-        for (let i = 1; i <= 22; i++) {
-            const card = document.createElement('div');
-            card.className = 'photo-card';
-            // Gives each photo a random slight tilt for a "scattered" look
-            card.style.setProperty('--r', (Math.random() * 6 - 3)); 
-            card.innerHTML = `<img src="${i}.jpg" alt="Memory ${i}">`;
-            gallery.appendChild(card);
+        // Phase Controller
+        function goToPhase(num) {
+            document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+            const target = num === 'final' ? 'final' : 'phase' + num;
+            document.getElementById(target).classList.add('active');
+
+            // Update Progress Bar
+            if(num === 2) { 
+                progressBar.style.width = "50%"; 
+                loadGallery();
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+            if(num === 3) { 
+                progressBar.style.width = "75%"; 
+                loadQuestion(); 
+            }
+            if(num === 'final') { progressBar.style.width = "100%"; }
         }
 
-        // The Roaming "No" Button
+        // Roaming "No" Button
         function moveNo() {
             const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 20);
             const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 20);
@@ -104,14 +197,67 @@
             noBtn.style.left = x + 'px';
             noBtn.style.top = y + 'px';
         }
-
         noBtn.addEventListener('mouseover', moveNo);
         noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNo(); });
 
-        function finish() {
-            confetti({ particleCount: 250, spread: 100, origin: { y: 0.6 } });
-            document.getElementById('main-content').style.display = 'none';
-            document.getElementById('success').style.display = 'block';
+        // Gallery Loader
+        function loadGallery() {
+            const container = document.getElementById('galleryContainer');
+            if(container.children.length > 0) return;
+            for(let i = 1; i <= 22; i++) {
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.innerHTML = `<img src="${i}.jpg" alt="Memory ${i}">`;
+                container.appendChild(card);
+            }
+        }
+
+        // Quiz Logic
+        const questions = [
+            { q: "Enter the exact date we got together (Format: Oct 27 2023):", a: "oct 27 2023" },
+            { q: "Which place do we visit the most? (Hint: 🌊)", a: "beach" },
+            { q: "Which food item did Afsal trick you into sharing? (His favorite heist)", a: "chole bhature" },
+            { q: "What part of Afsal's body is 'chubby' and gets teased constantly?", a: "tummy" },
+            { q: "What is your favorite way to attack/annoy Afsal? (Hint: 🦷)", a: "bite" },
+            { q: "Last one: Are you ready to keep scolding and loving me in Version 2.0?", a: "any" }
+        ];
+
+        let currentQ = 0;
+
+        function loadQuestion() {
+            const qText = document.getElementById('question-text');
+            qText.style.opacity = 0;
+            setTimeout(() => {
+                qText.innerText = questions[currentQ].q;
+                qText.style.opacity = 1;
+            }, 300);
+            document.getElementById('quiz-answer').value = "";
+        }
+
+        function checkAnswer() {
+            const userAns = document.getElementById('quiz-answer').value.toLowerCase().trim();
+            const correctAns = questions[currentQ].a;
+
+            if (correctAns === "any" || userAns.includes(correctAns) || (correctAns === "chole bhature" && userAns.includes("chole"))) {
+                currentQ++;
+                if (currentQ < questions.length) {
+                    loadQuestion();
+                } else {
+                    goToPhase('final');
+                    triggerFinalConfetti();
+                }
+            } else {
+                alert("Incorrect key! Try again, Sneha. ❤️");
+            }
+        }
+
+        function triggerFinalConfetti() {
+            const end = Date.now() + (5 * 1000);
+            (function frame() {
+                confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff4d6d', '#ff758f'] });
+                confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff4d6d', '#ff758f'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
         }
     </script>
 </body>
