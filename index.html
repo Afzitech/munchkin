@@ -31,7 +31,7 @@
         #yesBtn { background: var(--primary); color: white; font-size: 1.1rem; }
 
         .quiz-input { width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #eee; border-radius: 10px; outline: none; box-sizing: border-box; font-family: inherit; }
-        #question-text { font-weight: bold; min-height: 60px; display: flex; align-items: center; justify-content: center; }
+        #question-text { font-weight: bold; min-height: 80px; display: flex; align-items: center; justify-content: center; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -85,9 +85,15 @@
         </div>
 
         <div id="final" class="phase">
-            <h1 style="font-size: 3rem;">❤️</h1>
+            <h1 style="font-size: 3rem; animation: beat 1s infinite;">❤️</h1>
             <h1>Update Complete!</h1>
-            <p>System Status: Perfect.<br>Ready for Version 2.0 with Ponuzz.</p>
+            <div style="text-align: left; font-size: 0.9rem; line-height: 1.5; margin: 20px 0; color: #590d22;">
+                <p>Hey Ponuzz,</p>
+                <p>Seeing those 22 memories reminded me how much we've built together. Even when things got heavy, I never stopped wanting you by my side.</p>
+                <p>I don't just want a Valentine; I want us back. Version 2.0 is waiting for you.</p>
+            </div>
+            <p style="font-weight: bold; color: var(--primary);">System Status: Ready to come home?</p>
+            <p style="font-size: 0.8rem; color: #888;">- Afsal Rahman J</p>
         </div>
     </div>
 
@@ -95,10 +101,12 @@
         const bgMusic = document.getElementById('bgMusic');
         const loaderFill = document.getElementById('loader-fill');
         
+        // Finalized Question List
         const questions = [
             { q: "nammal onicha day etha?? (dd/mm/yyyy)", a: "27/10/2023" },
             { q: "endae ethu body part paranja nee enne kali akaru?", a: "kunu vayaru" },
-            { q: "nindae ormaikai eniku thana kadi? (Hint: 🦷)", a: "kadi" }
+            { q: "nindae ormaikai eniku thana kadi? (Hint: 🦷)", a: "kadi" },
+            { q: "Everything feels better when we're together. Will you come back to me, Sneha? (Type 'Yes' to finish)", a: "yes" }
         ];
         let currentQ = 0;
 
@@ -127,20 +135,14 @@
         }
 
         function goToPhase(num) {
-            // Hide all phases
             document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
-            
             const targetId = num === 'final' ? 'final' : 'phase' + num;
-            const targetElement = document.getElementById(targetId);
+            document.getElementById(targetId).classList.add('active');
             
-            // Show the target phase
-            targetElement.classList.add('active');
-            
-            // Run specific phase logic
             if(num === 2) loadGallery();
             if(num === 4) {
-                currentQ = 0; // Reset question index
-                loadQuestion(); // Force immediate load of first question
+                currentQ = 0; 
+                loadQuestion(); 
             }
         }
 
