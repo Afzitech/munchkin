@@ -95,8 +95,15 @@
         const bgMusic = document.getElementById('bgMusic');
         const loaderFill = document.getElementById('loader-fill');
         
+        const questions = [
+            { q: "nammal onicha day etha?? (dd/mm/yyyy)", a: "27/10/2023" },
+            { q: "endae ethu body part paranja nee enne kali akaru?", a: "kunu vayaru" },
+            { q: "nindae ormaikai eniku thana kadi? (Hint: 🦷)", a: "kadi" }
+        ];
+        let currentQ = 0;
+
         function startExperience() {
-            bgMusic.play().catch(e => console.log("Audio play blocked by browser"));
+            bgMusic.play().catch(e => console.log("Audio play blocked"));
             triggerLoading("Initializing Emotional Cache...", 2);
         }
 
@@ -105,7 +112,6 @@
             document.getElementById('loading-phase').classList.add('active');
             document.getElementById('load-text').innerText = text;
             
-            // Reset loader bar for each transition
             loaderFill.style.width = "0%";
             
             let progress = 0;
@@ -121,12 +127,44 @@
         }
 
         function goToPhase(num) {
+            // Hide all phases
             document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
-            const target = num === 'final' ? 'final' : 'phase' + num;
-            document.getElementById(target).classList.add('active');
             
+            const targetId = num === 'final' ? 'final' : 'phase' + num;
+            const targetElement = document.getElementById(targetId);
+            
+            // Show the target phase
+            targetElement.classList.add('active');
+            
+            // Run specific phase logic
             if(num === 2) loadGallery();
-            if(num === 4) loadQuestion(); // FIXED: Now it actually loads the questions
+            if(num === 4) {
+                currentQ = 0; // Reset question index
+                loadQuestion(); // Force immediate load of first question
+            }
+        }
+
+        function loadQuestion() { 
+            const qBox = document.getElementById('question-text');
+            if (qBox) {
+                qBox.innerText = questions[currentQ].q;
+                document.getElementById('quiz-answer').value = "";
+            }
+        }
+
+        function checkAnswer() {
+            const ans = document.getElementById('quiz-answer').value.toLowerCase().trim();
+            if(ans.includes(questions[currentQ].a)) {
+                currentQ++;
+                if(currentQ < questions.length) {
+                    loadQuestion();
+                } else { 
+                    goToPhase('final'); 
+                    confetti({particleCount: 200, spread: 100, origin: {y: 0.6}}); 
+                }
+            } else { 
+                alert("Incorrect! Try again, Ponuzz. ❤️"); 
+            }
         }
 
         function loadGallery() {
@@ -147,41 +185,13 @@
             let val = this.value;
             document.getElementById('slider-val').innerText = val + "%";
             if(val > 90) {
-                sliderMsg.innerText = "Error: System Overload! Love capacity exceeded.";
+                sliderMsg.innerText = "Error: System Overload!";
                 this.value = 89; 
             } else if (val == 89) {
                 sliderMsg.innerText = "Optimal Calibration detected.";
                 document.getElementById('sliderNext').style.display = 'block';
             }
         };
-
-        const questions = [
-            { q: "nammal onicha day etha?? (dd/mm/yyyy)", a: "27/10/2023" },
-            { q: "endae ethu body part paranja nee enne kali akaru?", a: "kunu vayaru" },
-            { q: "nindae ormaikai eniku thana kadi? (Hint: 🦷)", a: "kadi" }
-        ];
-
-        let currentQ = 0;
-        
-        function loadQuestion() { 
-            document.getElementById('question-text').innerText = questions[currentQ].q;
-            document.getElementById('quiz-answer').value = ""; // Clear input for each question
-        }
-
-        function checkAnswer() {
-            const ans = document.getElementById('quiz-answer').value.toLowerCase().trim();
-            if(ans.includes(questions[currentQ].a)) {
-                currentQ++;
-                if(currentQ < questions.length) {
-                    loadQuestion();
-                } else { 
-                    goToPhase('final'); 
-                    confetti({particleCount: 200, spread: 100, origin: {y: 0.6}}); 
-                }
-            } else { 
-                alert("Access Denied! Are you sure you're the real Ponuzz?"); 
-            }
-        }
 
         const noBtn = document.getElementById('noBtn');
         noBtn.addEventListener('mouseover', () => {
