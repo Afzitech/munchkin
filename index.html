@@ -6,259 +6,173 @@
     <title>Afsal_Sneha_v2.patch</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --primary: #ff4d6d; --secondary: #590d22; --bg: #fff0f3; --dark: #2b2d42; }
+        :root { --primary: #ff4d6d; --secondary: #590d22; --bg: #fff0f3; }
+        body { margin: 0; background: var(--bg); font-family: 'Courier New', monospace; color: var(--secondary); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        #container { width: 90%; max-width: 500px; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; position: relative; }
         
-        body { 
-            margin: 0; 
-            background: var(--bg); 
-            font-family: 'Courier New', Courier, monospace; 
-            color: var(--secondary); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            overflow-x: hidden; 
-        }
-
-        #container { 
-            width: 90%; 
-            max-width: 500px; 
-            background: white; 
-            padding: 30px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            text-align: center; 
-            position: relative; 
-            min-height: 400px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
         .phase { display: none; }
-        .active { display: block; animation: fadeIn 0.8s; }
-        
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(10px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
+        .active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Progress Bar */
-        .progress-container {
-            width: 100%;
-            height: 8px;
-            background: #eee;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-        #progress-bar {
-            width: 25%;
-            height: 100%;
-            background: var(--primary);
-            transition: width 0.5s ease;
-        }
+        /* Loading Screen Styling */
+        #loading-screen { display: none; }
+        .loader-bar { width: 100%; height: 10px; background: #eee; border-radius: 10px; margin: 20px 0; overflow: hidden; }
+        .loader-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.2s; }
 
-        /* Phase 2: Gallery Styling */
-        .gallery { 
-            display: flex; 
-            overflow-x: auto; 
-            gap: 15px; 
-            padding: 20px 0; 
-            scroll-snap-type: x mandatory; 
-            scrollbar-width: none;
-        }
-        .gallery::-webkit-scrollbar { display: none; }
-        
-        .photo-card { 
-            flex: 0 0 85%; 
-            scroll-snap-align: center; 
-            border: 5px solid white; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
-            border-radius: 10px; 
-            background: #fff;
-        }
-        .photo-card img { width: 100%; border-radius: 5px; display: block; }
+        /* Gallery */
+        .gallery { display: flex; overflow-x: auto; gap: 15px; padding: 20px 0; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        .photo-card { flex: 0 0 85%; scroll-snap-align: center; border: 5px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-radius: 10px; }
+        .photo-card img { width: 100%; border-radius: 5px; }
 
-        /* Buttons */
-        .btn-group { 
-            display: flex; 
-            justify-content: center; 
-            gap: 20px; 
-            margin-top: 25px; 
-            height: 50px; 
-            position: relative; 
-        }
-        
-        button { 
-            padding: 12px 25px; 
-            border: none; 
-            border-radius: 50px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-family: inherit; 
-            transition: 0.3s; 
-        }
+        /* Slider */
+        .slider-box { margin: 30px 0; padding: 20px; background: #fff0f3; border-radius: 15px; }
+        input[type=range] { width: 100%; cursor: pointer; accent-color: var(--primary); }
 
-        .btn-next { background: var(--primary); color: white; width: 100%; margin-top: 15px; }
-        #yesBtn { background: var(--primary); color: white; font-size: 1.1rem; }
-        #noBtn { background: #dee2e6; color: #495057; position: absolute; z-index: 1000; }
-
-        /* Phase 3: Quiz Styling */
-        .quiz-input { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 15px 0; 
-            border: 2px solid #eee; 
-            border-radius: 10px; 
-            outline: none; 
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-        .quiz-input:focus { border-color: var(--primary); }
-        #question-text { font-weight: bold; min-height: 50px; transition: opacity 0.3s; }
-
-        /* Final Heart */
-        .heart-loader { font-size: 4rem; animation: beat 1s infinite; margin-bottom: 10px; }
-        @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        button { padding: 12px 25px; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; margin-top: 15px; }
+        .btn-next { background: var(--primary); color: white; width: 100%; }
+        #noBtn { background: #dee2e6; position: absolute; }
+        #yesBtn { background: var(--primary); color: white; }
     </style>
 </head>
 <body>
 
+    <audio id="bgMusic" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
     <div id="container">
-        <div class="progress-container">
-            <div id="progress-bar"></div>
+        <div id="loading-phase" class="phase">
+            <h2 id="load-text">Decrypting Data...</h2>
+            <div class="loader-bar"><div class="loader-fill" id="loader-fill"></div></div>
+            <p id="load-status" style="font-size: 0.8rem;">Accessing secure sectors...</p>
         </div>
 
         <div id="phase1" class="phase active">
-            <h1 style="color: var(--primary)">System Alert ⚠️</h1>
-            <p>A major update to <strong>Connection_v2.0</strong> is ready for deployment.</p>
-            <p style="font-size: 1.2rem; margin: 25px 0;"><strong>Will you be my Valentine, Ponuzz?</strong></p>
-            <div class="btn-group">
-                <button id="yesBtn" onclick="goToPhase(2)">YES</button>
+            <h1>System Alert ⚠️</h1>
+            <p>Update <strong>Ponuzz_v2.0</strong> is ready.</p>
+            <h2 style="color: var(--primary)">Will you be my Valentine?</h2>
+            <div class="btn-group" style="height: 50px; position: relative;">
+                <button id="yesBtn" onclick="startExperience()">YES</button>
                 <button id="noBtn">No</button>
             </div>
         </div>
 
         <div id="phase2" class="phase">
-            <h1 style="color: var(--primary)">Restoring Fragments...</h1>
-            <p>Scanning 22 memory sectors found in local storage:</p>
+            <h1>Memory Logs 📂</h1>
             <div class="gallery" id="galleryContainer"></div>
-            <p style="font-size: 0.8rem; color: #888;">Swipe to verify all 22 memories &gt;&gt;</p>
-            <button class="btn-next" onclick="goToPhase(3)">Next: Security Verification</button>
+            <p style="font-size: 0.8rem;">Swipe through all 22 memories to unlock next stage.</p>
+            <button class="btn-next" id="galleryNext" style="display:none" onclick="triggerLoading('Optimizing Connection...', 3)">Unlock Identity Check</button>
         </div>
 
         <div id="phase3" class="phase">
-            <h1 style="color: var(--primary)">Identity Check 🔐</h1>
-            <p style="font-size: 0.8rem;">Answer correctly to merge the Valentine branch.</p>
-            <div id="quiz-content">
-                <p id="question-text">Loading...</p>
-                <input type="text" id="quiz-answer" class="quiz-input" placeholder="Type answer here...">
-                <button class="btn-next" onclick="checkAnswer()">Verify Identity</button>
+            <h1>Calibration ⚙️</h1>
+            <p>On a scale of 1 to 100, how much do you love Afsal?</p>
+            <div class="slider-box">
+                <h2 id="slider-val">50%</h2>
+                <input type="range" min="1" max="100" value="50" id="loveSlider">
+                <p id="slider-msg" style="font-size: 0.7rem; color: var(--primary); height: 20px;"></p>
             </div>
+            <button class="btn-next" id="sliderNext" style="display:none" onclick="triggerLoading('Verifying Identity...', 4)">Proceed to Final Verification</button>
+        </div>
+
+        <div id="phase4" class="phase">
+            <h1>Identity Check 🔐</h1>
+            <p id="question-text">Loading...</p>
+            <input type="text" id="quiz-answer" style="width:100%; padding:10px; margin:10px 0; border-radius:10px; border:1px solid #ddd;" placeholder="Type here...">
+            <button class="btn-next" onclick="checkAnswer()">Verify</button>
         </div>
 
         <div id="final" class="phase">
-            <div class="heart-loader">❤️</div>
-            <h1 style="color: var(--primary)">Update Complete!</h1>
-            <p>Sneha, I'm so glad we're on the same page (literally). Let's make this year amazing. No more 'confusing' vibes, just us.</p>
-            <p style="font-size: 0.8rem; color: #888;">- Afsal Rahman J</p>
+            <h1 style="font-size: 3rem;">❤️</h1>
+            <h1>Update Complete!</h1>
+            <p>System Status: Perfect.<br>Ready for Version 2.0 with Ponuzz.</p>
         </div>
     </div>
 
     <script>
-        const noBtn = document.getElementById('noBtn');
-        const progressBar = document.getElementById('progress-bar');
+        const bgMusic = document.getElementById('bgMusic');
+        const loaderFill = document.getElementById('loader-fill');
+        
+        function startExperience() {
+            bgMusic.play();
+            triggerLoading("Initializing Emotional Cache...", 2);
+        }
 
-        // Phase Controller
+        function triggerLoading(text, nextPhase) {
+            document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+            document.getElementById('loading-phase').classList.add('active');
+            document.getElementById('load-text').innerText = text;
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => goToPhase(nextPhase), 500);
+                }
+                loaderFill.style.width = progress + "%";
+            }, 300);
+        }
+
         function goToPhase(num) {
             document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
             const target = num === 'final' ? 'final' : 'phase' + num;
             document.getElementById(target).classList.add('active');
-
-            // Update Progress Bar
-            if(num === 2) { 
-                progressBar.style.width = "50%"; 
-                loadGallery();
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-            }
-            if(num === 3) { 
-                progressBar.style.width = "75%"; 
-                loadQuestion(); 
-            }
-            if(num === 'final') { progressBar.style.width = "100%"; }
+            if(num === 2) loadGallery();
         }
 
-        // Roaming "No" Button
-        function moveNo() {
-            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 20);
-            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 20);
-            noBtn.style.position = 'fixed';
-            noBtn.style.left = x + 'px';
-            noBtn.style.top = y + 'px';
-        }
-        noBtn.addEventListener('mouseover', moveNo);
-        noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNo(); });
-
-        // Gallery Loader
+        // Gallery: Button appears only after 15 seconds
         function loadGallery() {
             const container = document.getElementById('galleryContainer');
             if(container.children.length > 0) return;
             for(let i = 1; i <= 22; i++) {
                 const card = document.createElement('div');
                 card.className = 'photo-card';
-                card.innerHTML = `<img src="${i}.jpg" alt="Memory ${i}">`;
+                card.innerHTML = `<img src="${i}.jpg">`;
                 container.appendChild(card);
             }
+            setTimeout(() => { document.getElementById('galleryNext').style.display = 'block'; }, 15000);
         }
 
-        // Quiz Logic
-        const questions = [
-            { q: "nammal onicha day etha?? (Format: dd/mm/yyyy):", a: "27/10/2023" },
-            { q: "namadae kuduthal memories ulla place? (Hint: 🌊)", a: "beach" },
-            { q: "nindae kai irunu njn adichu matiya food? (His favorite heist)", a: "chole bhature" },
-            { q: "endae ethu body part paranja nee enne kali akaru?", a: "kunu vayaru" },
-            { q: "nindae ormaikai  eniku kuduthal thana oru sathanam? (Hint: 🦷)", a: "kadi" },
-            { q: "Last one: pinnaiyum enne onu vazhaku paraiyanum, adi idakanum varan ready ahno?", a: "yes" }
-        ];
-
-        let currentQ = 0;
-
-        function loadQuestion() {
-            const qText = document.getElementById('question-text');
-            qText.style.opacity = 0;
-            setTimeout(() => {
-                qText.innerText = questions[currentQ].q;
-                qText.style.opacity = 1;
-            }, 300);
-            document.getElementById('quiz-answer').value = "";
-        }
-
-        function checkAnswer() {
-            const userAns = document.getElementById('quiz-answer').value.toLowerCase().trim();
-            const correctAns = questions[currentQ].a;
-
-            if (correctAns === "any" || userAns.includes(correctAns) || (correctAns === "chole bhature" && userAns.includes("chole"))) {
-                currentQ++;
-                if (currentQ < questions.length) {
-                    loadQuestion();
-                } else {
-                    goToPhase('final');
-                    triggerFinalConfetti();
-                }
-            } else {
-                alert("Incorrect key! Try again, Sneha. ❤️");
+        // Slider Logic
+        const slider = document.getElementById('loveSlider');
+        const sliderMsg = document.getElementById('slider-msg');
+        slider.oninput = function() {
+            let val = this.value;
+            document.getElementById('slider-val').innerText = val + "%";
+            if(val > 90) {
+                sliderMsg.innerText = "Error: Value too high for human heart!";
+                this.value = 89; // Bounce back!
+            } else if (val == 89) {
+                document.getElementById('sliderNext').style.display = 'block';
             }
+        };
+
+        // Quiz (Using your Malayalam/Manglish questions)
+        const questions = [
+            { q: "nammal onicha day etha?? (dd/mm/yyyy)", a: "27/10/2023" },
+            { q: "endae ethu body part paranja nee enne kali akaru?", a: "kunu vayaru" },
+            { q: "nindae ormaikai eniku thana kadi? (Hint: 🦷)", a: "kadi" }
+        ];
+        let currentQ = 0;
+        function loadQuestion() { document.getElementById('question-text').innerText = questions[currentQ].q; }
+        function checkAnswer() {
+            const ans = document.getElementById('quiz-answer').value.toLowerCase().trim();
+            if(ans.includes(questions[currentQ].a)) {
+                currentQ++;
+                if(currentQ < questions.length) loadQuestion();
+                else { goToPhase('final'); confetti({particleCount: 200, spread: 100}); }
+            } else { alert("Wrong! Are you really Ponuzz?"); }
         }
 
-        function triggerFinalConfetti() {
-            const end = Date.now() + (5 * 1000);
-            (function frame() {
-                confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff4d6d', '#ff758f'] });
-                confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff4d6d', '#ff758f'] });
-                if (Date.now() < end) requestAnimationFrame(frame);
-            }());
-        }
+        // Roaming No
+        const noBtn = document.getElementById('noBtn');
+        noBtn.addEventListener('mouseover', () => {
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = Math.random()*80 + "%";
+            noBtn.style.top = Math.random()*80 + "%";
+        });
     </script>
 </body>
 </html>
